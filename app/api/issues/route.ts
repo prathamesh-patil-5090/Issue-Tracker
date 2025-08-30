@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { issues, columns } from "@/lib/schema";
+import { issues } from "@/lib/schema";
 import { eq, desc } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {

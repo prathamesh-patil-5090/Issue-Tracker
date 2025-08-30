@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authConfig);
@@ -15,7 +15,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const issueId = parseInt(params.id);
+    const { id } = await params;
+    const issueId = parseInt(id);
     if (isNaN(issueId)) {
       return NextResponse.json({ error: "Invalid issue ID" }, { status: 400 });
     }
@@ -23,7 +24,12 @@ export async function PATCH(
     const { columnId, title, description } = await request.json();
 
     // Build update object
-    const updateData: Record<string, any> = {};
+    const updateData: {
+      title?: string;
+      description?: string;
+      columnId?: number;
+      updatedAt?: Date;
+    } = {};
     if (columnId !== undefined) updateData.columnId = columnId;
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
@@ -51,7 +57,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authConfig);
@@ -59,7 +65,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const issueId = parseInt(params.id);
+    const { id } = await params;
+    const issueId = parseInt(id);
     if (isNaN(issueId)) {
       return NextResponse.json({ error: "Invalid issue ID" }, { status: 400 });
     }

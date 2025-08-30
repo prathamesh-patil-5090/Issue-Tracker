@@ -2,7 +2,6 @@
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 export default function Login() {
   const router = useRouter();

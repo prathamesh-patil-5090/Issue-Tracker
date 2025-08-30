@@ -26,6 +26,28 @@ interface BoardData {
   issues: Issue[];
 }
 
+// Type for drag and drop event from @dnd-kit
+interface DragEndEvent {
+  active: {
+    id: string | number;
+    data?: {
+      current?: {
+        type?: string;
+        columnId?: number;
+      };
+    };
+  };
+  over: {
+    id: string | number;
+    data?: {
+      current?: {
+        type?: string;
+        columnId?: number;
+      };
+    };
+  } | null;
+}
+
 export default function Issues() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -58,7 +80,7 @@ export default function Issues() {
     }
   };
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
@@ -179,7 +201,11 @@ export default function Issues() {
     columnId?: number
   ) => {
     try {
-      const updateData: any = { title, description };
+      const updateData: {
+        title: string;
+        description?: string;
+        columnId?: number;
+      } = { title, description };
       if (columnId !== undefined) {
         updateData.columnId = columnId;
       }

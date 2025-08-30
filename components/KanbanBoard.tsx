@@ -125,6 +125,7 @@ export function KanbanBoard({
             onDeleteIssue={onDeleteIssue}
             onIssueClick={onIssueClick}
             canDelete={columns.length > 1}
+            isActive={activeId === column.id.toString()}
           />
         ))}
         {/* Add new column button */}

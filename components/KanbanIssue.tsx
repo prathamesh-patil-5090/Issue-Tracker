@@ -80,9 +80,10 @@ export function KanbanIssue({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerMove={handlePointerMove}
-      className={`bg-gray-700 p-2 sm:p-3 rounded-lg shadow-sm border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors duration-200 relative group ${
-        isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"
-      }`}
+      className={`bg-gray-700 p-2 sm:p-3 rounded-lg shadow-sm border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors duration-200 relative group
+      ${isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"}
+      ${isDragStart ? "ring-2 ring-blue-400" : ""}
+    `}
     >
       <div className="flex justify-between items-start">
         <div className="flex-1 min-w-0">

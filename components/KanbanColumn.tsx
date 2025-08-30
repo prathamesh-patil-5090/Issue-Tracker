@@ -26,6 +26,7 @@ interface KanbanColumnProps {
   onDeleteIssue: (issueId: number) => void;
   onIssueClick: (issue: Issue) => void;
   canDelete: boolean;
+  isActive: boolean;
 }
 
 export function KanbanColumn({

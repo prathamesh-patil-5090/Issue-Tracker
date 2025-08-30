@@ -2,7 +2,7 @@
 
 const nextConfig = {
   experimental: {
-    serverActions: true,
+    serverActions: {},
   },
   images: {
     domains: ["lh3.googleusercontent.com"],
@@ -11,14 +11,6 @@ const nextConfig = {
   // Optimize for Vercel deployment
   poweredByHeader: false,
   compress: true,
-
-  // Ignore build errors
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 export default nextConfig;
