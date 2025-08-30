@@ -22,6 +22,8 @@ interface KanbanColumnProps {
   issues: Issue[];
   onAddIssue: (columnId: number, title: string, description?: string) => void;
   onDeleteColumn: (columnId: number) => void;
+  onEditColumn: (columnId: number, newName: string) => void;
+  onDeleteIssue: (issueId: number) => void;
   onIssueClick: (issue: Issue) => void;
   canDelete: boolean;
 }
@@ -32,6 +34,8 @@ export function KanbanColumn({
   issues,
   onAddIssue,
   onDeleteColumn,
+  onEditColumn,
+  onDeleteIssue,
   onIssueClick,
   canDelete,
 }: KanbanColumnProps) {
@@ -45,6 +49,8 @@ export function KanbanColumn({
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
 
   const handleAddIssue = async () => {
     if (newTitle.trim()) {
@@ -57,6 +63,26 @@ export function KanbanColumn({
       setNewDescription("");
       setIsAdding(false);
     }
+  };
+
+  const handleEditColumn = async () => {
+    if (editTitle.trim() && editTitle !== title) {
+      await onEditColumn(parseInt(id), editTitle.trim());
+      setIsEditing(false);
+    } else {
+      setIsEditing(false);
+      setEditTitle(title);
+    }
+  };
+
+  const handleStartEdit = () => {
+    setEditTitle(title);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditTitle(title);
   };
 
   const handleDeleteColumn = () => {
@@ -79,29 +105,106 @@ export function KanbanColumn({
   return (
     <div className="bg-gray-800 p-3 sm:p-4 rounded-lg min-h-[300px] sm:min-h-[400px] w-full sm:w-80 border border-gray-700 flex-shrink-0">
       <div className="flex justify-between items-center mb-3 sm:mb-4">
-        <h3 className="font-semibold text-white text-sm sm:text-base truncate pr-2">
-          {title}
-        </h3>
-        {canDelete && (
-          <button
-            onClick={handleDeleteColumn}
-            className="text-red-400 hover:text-red-300 transition-colors duration-200 flex-shrink-0"
-            title="Delete column"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        {isEditing ? (
+          <div className="flex-1 flex items-center space-x-2">
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleEditColumn();
+                if (e.key === "Escape") handleCancelEdit();
+              }}
+              className="flex-1 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm sm:text-base focus:border-blue-500 focus:outline-none"
+              autoFocus
+            />
+            <button
+              onClick={handleEditColumn}
+              className="text-green-400 hover:text-green-300 transition-colors duration-200 flex-shrink-0"
+              title="Save"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              className="text-gray-400 hover:text-gray-300 transition-colors duration-200 flex-shrink-0"
+              title="Cancel"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <>
+            <h3 className="font-semibold text-white text-sm sm:text-base truncate pr-2">
+              {title}
+            </h3>
+            <div className="flex items-center space-x-1 flex-shrink-0">
+              <button
+                onClick={handleStartEdit}
+                className="text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                title="Edit column"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+              {canDelete && (
+                <button
+                  onClick={handleDeleteColumn}
+                  className="text-red-400 hover:text-red-300 transition-colors duration-200"
+                  title="Delete column"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </>
         )}
       </div>
       <div ref={setNodeRef} className="space-y-3">
@@ -117,6 +220,7 @@ export function KanbanColumn({
               description={issue.description}
               columnId={issue.columnId}
               onClick={() => onIssueClick(issue)}
+              onDelete={onDeleteIssue}
             />
           ))}
         </SortableContext>

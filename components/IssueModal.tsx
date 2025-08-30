@@ -27,6 +27,7 @@ interface IssueModalProps {
     description?: string,
     columnId?: number
   ) => void;
+  onDelete: (issueId: number) => void;
 }
 
 export function IssueModal({
@@ -35,6 +36,7 @@ export function IssueModal({
   isOpen,
   onClose,
   onUpdate,
+  onDelete,
 }: IssueModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -168,19 +170,35 @@ export function IssueModal({
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-3 mt-4 sm:mt-6">
             <button
-              onClick={onClose}
-              className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base order-2 sm:order-1"
+              onClick={() => {
+                if (
+                  issue &&
+                  confirm("Are you sure you want to delete this issue?")
+                ) {
+                  onDelete(issue.id);
+                  onClose();
+                }
+              }}
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base order-3 sm:order-1"
             >
-              Cancel
+              Delete Issue
             </button>
-            <button
-              onClick={handleSave}
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base order-1 sm:order-2"
-            >
-              Save Changes
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 order-1 sm:order-2">
+              <button
+                onClick={onClose}
+                className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+              >
+                Save Changes
+              </button>
+            </div>
           </div>
 
           <div className="mt-3 sm:mt-4 text-xs text-gray-400 text-center">

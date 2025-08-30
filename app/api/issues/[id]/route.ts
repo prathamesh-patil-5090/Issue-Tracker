@@ -48,3 +48,37 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const issueId = parseInt(params.id);
+    if (isNaN(issueId)) {
+      return NextResponse.json({ error: "Invalid issue ID" }, { status: 400 });
+    }
+
+    const deletedIssue = await db
+      .delete(issues)
+      .where(eq(issues.id, issueId))
+      .returning();
+
+    if (!deletedIssue.length) {
+      return NextResponse.json({ error: "Issue not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Issue deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting issue:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

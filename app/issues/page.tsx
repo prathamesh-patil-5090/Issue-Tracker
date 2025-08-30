@@ -221,6 +221,47 @@ export default function Issues() {
     }
   };
 
+  const handleEditColumn = async (columnId: number, newName: string) => {
+    try {
+      const response = await fetch(`/api/columns/${columnId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      if (response.ok) {
+        fetchBoardData();
+      } else {
+        console.error("Failed to edit column");
+      }
+    } catch (error) {
+      console.error("Error editing column:", error);
+    }
+  };
+
+  const handleDeleteIssue = async (issueId: number) => {
+    if (!confirm("Are you sure you want to delete this issue?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/issues/${issueId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        fetchBoardData();
+        setSelectedIssue(null); // Close modal if the deleted issue was selected
+      } else {
+        console.error("Failed to delete issue");
+      }
+    } catch (error) {
+      console.error("Error deleting issue:", error);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -306,6 +347,8 @@ export default function Issues() {
               onAddColumn={handleAddColumn}
               onIssueClick={handleIssueClick}
               onDeleteColumn={handleDeleteColumn}
+              onEditColumn={handleEditColumn}
+              onDeleteIssue={handleDeleteIssue}
             />
             {selectedIssue && (
               <IssueModal
@@ -314,6 +357,7 @@ export default function Issues() {
                 columns={boardData.columns}
                 onClose={() => setSelectedIssue(null)}
                 onUpdate={handleIssueUpdate}
+                onDelete={handleDeleteIssue}
               />
             )}
           </>

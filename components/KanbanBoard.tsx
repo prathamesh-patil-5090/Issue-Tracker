@@ -35,6 +35,8 @@ interface KanbanBoardProps {
   onAddIssue: (columnId: number, title: string, description?: string) => void;
   onAddColumn: (name: string) => void;
   onDeleteColumn: (columnId: number) => void;
+  onEditColumn: (columnId: number, newName: string) => void;
+  onDeleteIssue: (issueId: number) => void;
   onIssueClick: (issue: Issue) => void;
 }
 
@@ -45,6 +47,8 @@ export function KanbanBoard({
   onAddIssue,
   onAddColumn,
   onDeleteColumn,
+  onEditColumn,
+  onDeleteIssue,
   onIssueClick,
 }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -117,6 +121,8 @@ export function KanbanBoard({
             issues={issuesByColumn[column.id] || []}
             onAddIssue={onAddIssue}
             onDeleteColumn={onDeleteColumn}
+            onEditColumn={onEditColumn}
+            onDeleteIssue={onDeleteIssue}
             onIssueClick={onIssueClick}
             canDelete={columns.length > 1}
           />

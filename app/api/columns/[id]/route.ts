@@ -5,6 +5,50 @@ import { db } from "@/lib/db";
 import { columns, issues } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const columnId = parseInt(params.id);
+    if (isNaN(columnId)) {
+      return NextResponse.json({ error: "Invalid column ID" }, { status: 400 });
+    }
+
+    const { name } = await request.json();
+
+    if (!name || !name.trim()) {
+      return NextResponse.json(
+        { error: "Column name is required" },
+        { status: 400 }
+      );
+    }
+
+    const updatedColumn = await db
+      .update(columns)
+      .set({ name: name.trim() })
+      .where(eq(columns.id, columnId))
+      .returning();
+
+    if (!updatedColumn.length) {
+      return NextResponse.json({ error: "Column not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedColumn[0]);
+  } catch (error) {
+    console.error("Error updating column:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
