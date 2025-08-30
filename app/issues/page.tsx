@@ -81,13 +81,17 @@ export default function Issues() {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || active.id === over.id) return;
+    if (!over || active.id === over.id) {
+      return;
+    }
 
     const activeIssue = boardData?.issues.find(
-      (issue) => issue.id === active.id
+      (issue) => issue.id.toString() === active.id.toString()
     );
 
-    if (!activeIssue) return;
+    if (!activeIssue) {
+      return;
+    }
 
     // Determine the target column
     let targetColumnId: number | null = null;
@@ -118,26 +122,46 @@ export default function Issues() {
       }
     }
 
-    if (!targetColumnId || activeIssue.columnId === targetColumnId) return;
+    if (!targetColumnId || activeIssue.columnId === targetColumnId) {
+      return;
+    }
 
-    console.log("Moving issue", activeIssue.id, "to column", targetColumnId);
+    // Optimistic update: Update UI immediately
+    const optimisticUpdate = () => {
+      if (!boardData) return;
+
+      const updatedIssues = boardData.issues.map((issue) =>
+        issue.id === activeIssue.id
+          ? { ...issue, columnId: targetColumnId }
+          : issue
+      );
+
+      setBoardData({
+        ...boardData,
+        issues: updatedIssues,
+      });
+    };
+
+    // Apply optimistic update
+    optimisticUpdate();
 
     try {
+      // Use the original API endpoint to test
       const response = await axios.patch(`/api/issues/${activeIssue.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ columnId: targetColumnId }),
+        columnId: targetColumnId,
       });
 
-      if (response.statusText) {
+      if (response.status === 200) {
+        // Refresh to ensure data consistency
         fetchBoardData();
       } else {
-        console.error("Failed to move issue:", response.statusText);
+        // Revert optimistic update on failure
+        fetchBoardData();
       }
-    } catch (error) {
-      console.error("Error moving issue:", error);
+    } catch (error: unknown) {
+      // Revert optimistic update on error
+      console.error("An error occurred:", error);
+      fetchBoardData();
     }
   };
 
@@ -188,7 +212,6 @@ export default function Issues() {
   };
 
   const handleIssueClick = (issue: Issue) => {
-    console.log("Issue clicked:", issue); // Debug log
     setSelectedIssue(issue);
   };
 
@@ -360,7 +383,7 @@ export default function Issues() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-3 sm:py-6 px-2 sm:px-4">
+      <main className="py-3 sm:py-6">
         {boardData ? (
           <>
             <KanbanBoard

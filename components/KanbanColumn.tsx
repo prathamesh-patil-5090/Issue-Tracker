@@ -26,7 +26,8 @@ interface KanbanColumnProps {
   onDeleteIssue: (issueId: number) => void;
   onIssueClick: (issue: Issue) => void;
   canDelete: boolean;
-  isActive: boolean;
+  isActive?: boolean;
+  isDraggedOver?: boolean;
 }
 
 export function KanbanColumn({
@@ -39,6 +40,8 @@ export function KanbanColumn({
   onDeleteIssue,
   onIssueClick,
   canDelete,
+  isActive = false,
+  isDraggedOver = false,
 }: KanbanColumnProps) {
   const { setNodeRef } = useDroppable({
     id,
@@ -104,7 +107,16 @@ export function KanbanColumn({
   };
 
   return (
-    <div className="bg-gray-800 p-3 sm:p-4 rounded-lg min-h-[300px] sm:min-h-[400px] w-full sm:w-80 border border-gray-700 flex-shrink-0">
+    <div
+      ref={setNodeRef}
+      className={`bg-gray-800 p-3 sm:p-4 rounded-lg min-h-[500px] sm:min-h-[600px] w-72 sm:w-80 border flex-shrink-0 transition-all duration-200 ${
+        isDraggedOver
+          ? "border-blue-500 bg-gray-750 shadow-lg shadow-blue-500/20"
+          : isActive
+          ? "border-blue-400"
+          : "border-gray-700"
+      }`}
+    >
       <div className="flex justify-between items-center mb-3 sm:mb-4">
         {isEditing ? (
           <div className="flex-1 flex items-center space-x-2">
