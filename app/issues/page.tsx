@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { KanbanBoard } from "@/components/KanbanBoard";
 import { IssueModal } from "@/components/IssueModal";
+import axios from "axios";
 
 interface Issue {
   id: number;
@@ -68,11 +69,8 @@ export default function Issues() {
 
   const fetchBoardData = async () => {
     try {
-      const response = await fetch("/api/board");
-      if (response.ok) {
-        const data = await response.json();
-        setBoardData(data);
-      }
+      const response = await axios.get("/api/board");
+      setBoardData(response.data);
     } catch (error) {
       console.error("Error fetching board data:", error);
     } finally {
@@ -125,7 +123,7 @@ export default function Issues() {
     console.log("Moving issue", activeIssue.id, "to column", targetColumnId);
 
     try {
-      const response = await fetch(`/api/issues/${activeIssue.id}`, {
+      const response = await axios.patch(`/api/issues/${activeIssue.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -133,7 +131,7 @@ export default function Issues() {
         body: JSON.stringify({ columnId: targetColumnId }),
       });
 
-      if (response.ok) {
+      if (response.statusText) {
         fetchBoardData();
       } else {
         console.error("Failed to move issue:", response.statusText);

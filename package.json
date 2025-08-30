@@ -17,6 +17,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@neondatabase/serverless": "^1.0.1",
+    "axios": "^1.11.0",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.5",
     "next": "15.5.2",
